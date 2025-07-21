@@ -28,7 +28,7 @@ import renpy.audio  # @UnusedImport
 import renpy.display  # @UnusedImport
 
 import time
-import pygame_sdl2  # @UnusedImport
+import pygame  # @UnusedImport
 import os
 import re
 

@@ -24,14 +24,11 @@
 DEF ANGLE = False
 
 from libc.stdlib cimport malloc, free
-from sdl2 cimport *
+from pygame cimport *
 from gl cimport *
 
-from pygame_sdl2 cimport *
-import_pygame_sdl2()
-
 import renpy
-import pygame_sdl2 as pygame
+import pygame
 import os
 import os.path
 import weakref
@@ -157,11 +154,9 @@ cdef class GLDraw:
     def set_mode(self, virtual_size, physical_size, fullscreen):
         """
         This changes the video mode. It also initializes OpenGL, if it
-        can. It returns True if it was successful, or False if OpenGL isn't
+        can. It returns True if it was succesful, or False if OpenGL isn't
         working for some reason.
         """
-
-        global vsync
 
         cdef char *egl_error
 
@@ -185,7 +180,7 @@ cdef class GLDraw:
             pygame.display.init()
 
             if self.display_info is None:
-                self.display_info = renpy.display.get_info()
+                self.display_info = pygame.display.Info()
 
             self.old_fullscreen = fullscreen
 
@@ -197,50 +192,24 @@ cdef class GLDraw:
 
         vwidth, vheight = virtual_size
         pwidth, pheight = physical_size
-
-        if pwidth is None:
-            pwidth = vwidth
-            pheight = vheight
-
         virtual_ar = 1.0 * vwidth / vheight
-
-        pwidth *= self.dpi_scale
-        pheight *= self.dpi_scale
 
         pwidth = max(vwidth / 2, pwidth)
         pheight = max(vheight / 2, pheight)
 
-        window_args = { }
-
-        if not renpy.mobile:
-            info = renpy.display.get_info()
-
-            visible_w = info.current_w
-            visible_h = info.current_h
-
-            if renpy.windows and renpy.windows <= (6, 1):
-                visible_h -= 102
-
-            bounds = pygame.display.get_display_bounds(0)
-
-            renpy.display.log.write("primary display bounds: %r", bounds)
-
-            head_full_w = bounds[2]
-            head_w = bounds[2] - 102
-            head_h = bounds[3] - 102
-
-            pwidth = min(visible_w, pwidth)
-            pheight = min(visible_h, pheight)
+        if renpy.android:
+            pheight = self.display_info.current_h
+            pwidth = self.display_info.current_w
+        else:
+            pheight = min(self.display_info.current_h - 102, pheight)
+            pwidth = min(self.display_info.current_w - 102, pwidth)
 
             # The first time through.
             if not self.did_init:
-                pwidth = min(pwidth, head_w)
-                pheight = min(pheight, head_h)
-
                 pwidth, pheight = min(pheight * virtual_ar, pwidth), min(pwidth / virtual_ar, pheight)
 
-        pwidth = int(round(pwidth))
-        pheight = int(round(pheight))
+        pwidth = int(pwidth)
+        pheight = int(pheight)
 
         pwidth = max(pwidth, 256)
         pheight = max(pheight, 256)
@@ -250,66 +219,34 @@ cdef class GLDraw:
 
         if ANGLE:
             opengl = 0
-            resizable = pygame.RESIZABLE
-
-        elif EGL:
-            opengl = 0
             resizable = 0
-
         elif renpy.android:
             opengl = pygame.OPENGL
             resizable = 0
-
-            pwidth = 0
-            pheight = 0
-
-        elif renpy.ios:
-            opengl = pygame.OPENGL | pygame.WINDOW_ALLOW_HIGHDPI
-            resizable = pygame.RESIZABLE
-
-            pygame.display.gl_set_attribute(pygame.GL_CONTEXT_MAJOR_VERSION, 2);
-            pygame.display.gl_set_attribute(pygame.GL_CONTEXT_MINOR_VERSION, 0);
-
-            pwidth = 0
-            pheight = 0
-
         else:
             opengl = pygame.OPENGL
-
-            if self.dpi_scale == 1.0:
-                opengl |= pygame.WINDOW_ALLOW_HIGHDPI
+            pygame.display.gl_set_attribute(pygame.GL_SWAP_CONTROL, vsync)
+            pygame.display.gl_set_attribute(pygame.GL_ALPHA_SIZE, 8)
 
             if renpy.config.gl_resize:
                 resizable = pygame.RESIZABLE
             else:
                 resizable = 0
 
-        if opengl:
-            pygame.display.gl_set_attribute(pygame.GL_SWAP_CONTROL, vsync)
-            pygame.display.gl_set_attribute(pygame.GL_ALPHA_SIZE, 8)
-
-
-        self.window = None
-
-        if fullscreen:
-            try:
+        try:
+            if fullscreen:
                 renpy.display.log.write("Fullscreen mode.")
-                self.window = pygame.display.set_mode((0, 0), pygame.WINDOW_FULLSCREEN_DESKTOP | opengl | pygame.DOUBLEBUF)
-            except pygame.error as e:
-                renpy.display.log.write("Opening in fullscreen failed: %r", e)
-                self.window = None
-
-        if self.window is None:
-            try:
+                self.window = pygame.display.set_mode((0, 0), pygame.FULLSCREEN | opengl | pygame.DOUBLEBUF)
+            else:
                 renpy.display.log.write("Windowed mode.")
-                self.window = pygame.display.set_mode((pwidth, pheight), resizable | opengl | pygame.DOUBLEBUF, **window_args)
+                self.window = pygame.display.set_mode((pwidth, pheight), resizable | opengl | pygame.DOUBLEBUF)
 
-            except pygame.error, e:
-                renpy.display.log.write("Could not get pygame screen: %r", e)
-                return False
+        except pygame.error, e:
+            renpy.display.log.write("Could not get pygame screen: %r", e)
+            return False
 
-        # Use EGL to get the OpenGL ES 2 context, if necessary.
-        if EGL:
+        # In ANGLE mode, we have to use EGL to get the OpenGL ES 2 context.
+        IF ANGLE:
 
             # This ensures the display is shown.
             pygame.display.flip()
@@ -322,30 +259,25 @@ cdef class GLDraw:
 
         # Get the size of the created screen.
         pwidth, pheight = self.window.get_size()
-
         self.physical_size = (pwidth, pheight)
-        self.drawable_size = pygame.display.get_drawable_size()
+        self.drawable_size = (pwidth, pheight)
 
-        renpy.display.log.write("Screen sizes: virtual=%r physical=%r drawable=%r" % (self.virtual_size, self.physical_size, self.drawable_size))
+        renpy.display.log.write("Screen sizes: virtual=%r physical=%r" % (self.virtual_size, self.physical_size))
 
-        if renpy.config.adjust_view_size is not None:
-            view_width, view_height = renpy.config.adjust_view_size(pwidth, pheight)
+        # Figure out the virtual box, which includes padding around
+        # the borders.
+        physical_ar = 1.0 * pwidth / pheight
+
+        if physical_ar >= virtual_ar:
+            x_padding = physical_ar * vheight - vwidth
+            y_padding = 0
+            px_padding = x_padding * pheight / vheight
+            py_padding = 0
         else:
-
-            # Figure out the virtual box, which includes padding around
-            # the borders.
-            physical_ar = 1.0 * pwidth / pheight
-
-            ratio = min(1.0 * pwidth / vwidth, 1.0 * pheight / vheight)
-
-            view_width = max(int(vwidth * ratio), 1)
-            view_height = max(int(vheight * ratio), 1)
-
-        px_padding = pwidth - view_width
-        py_padding = pheight - view_height
-
-        x_padding = px_padding * vwidth / view_width
-        y_padding = py_padding * vheight / view_height
+            x_padding = 0
+            y_padding = ( 1.0 / physical_ar ) * vwidth - vheight
+            px_padding = 0
+            py_padding = y_padding * pwidth / vwidth
 
         # The position of the physical screen, in virtual pixels
         # (x, y, w, h). Since the physical screen will always contain
@@ -367,21 +299,9 @@ cdef class GLDraw:
             pheight - int(py_padding),
             )
 
-        # Scale from the rtt size to the virtual size.
-        if renpy.config.use_drawable_resolution:
-            self.draw_per_virt = (1.0 * self.drawable_size[0] / pwidth) * (1.0 * view_width / vwidth)
-        else:
-            self.draw_per_virt = 1.0
-
-        self.virt_to_draw = render.Matrix2D(self.draw_per_virt, 0, 0, self.draw_per_virt)
-        self.draw_to_virt = render.Matrix2D(1.0 / self.draw_per_virt, 0, 0, 1.0 / self.draw_per_virt)
-
         if not self.did_init:
             if not self.init():
                 return False
-
-        if "RENPY_FAIL_" + self.info["renderer"].upper() in os.environ:
-            return False
 
         self.did_init = True
 

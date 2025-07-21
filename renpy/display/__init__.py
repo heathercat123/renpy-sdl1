@@ -43,7 +43,7 @@ def get_info():
     global info
 
     if info is None:
-        import pygame_sdl2 as pygame
+        import pygame
         pygame.display.init()
         info = pygame.display.Info()
 

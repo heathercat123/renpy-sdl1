@@ -23,7 +23,7 @@
 # ensures that returned surfaces have a 2px border around them.
 
 import sys
-import pygame_sdl2 as pygame
+import pygame
 import threading
 import renpy.display
 import renpy.audio

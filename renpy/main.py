@@ -35,6 +35,7 @@ import __main__
 
 last_clock = time.time()
 
+print("entered main.py (SDL1DBG)")
 
 def log_clock(s):
     global last_clock
@@ -44,6 +45,8 @@ def log_clock(s):
     renpy.display.log.write(s)
     if renpy.android and not renpy.config.log_to_stdout:
         print(s)
+    
+    print(s + "(LOGCLOCK)")
 
     last_clock = now
 
@@ -54,6 +57,7 @@ def reset_clock():
 
 
 def run(restart):
+    print("main.run (SDL1DBG)")
     """
     This is called during a single run of the script. Restarting the script
     will cause this to change.
@@ -104,13 +108,17 @@ def run(restart):
         renpy.scriptedit.lines.clear()
 
     # Sleep to finish the presplash.
+    print("Ahh, nighty nighty! (SDL1DBG)")
     renpy.display.presplash.sleep()
+    print("WAKE UP (SDL1DBG)")
 
     # Re-Initialize the log.
     game.log = renpy.python.RollbackLog()
+    print("rollbacklog")
 
     # Switch contexts, begin logging.
     game.contexts = [ renpy.execution.Context(True) ]
+    print("Switch context (SDL1DBG)")
 
     # Jump to an appropriate start label.
     if game.script.has_label("_start"):
@@ -122,6 +130,7 @@ def run(restart):
 
     # Perhaps warp.
     warp_label = renpy.warp.warp()
+    print("Perhaps warp (SDL1DBG)")
 
     if warp_label is not None:
 
@@ -140,11 +149,14 @@ def run(restart):
     renpy.store._restart = restart
 
     # We run until we get an exception.
+    print("Entering context (SDL1DBG)")
     renpy.display.interface.enter_context()
 
     log_clock("Running {}".format(start_label))
 
+    print("Running context")
     renpy.execution.run_context(True)
+    print("Leaving context (SDL1DBG)")
 
 
 def load_rpe(fn):
@@ -172,7 +184,7 @@ def choose_variants():
 
         import android  # @UnresolvedImport
         import math
-        import pygame_sdl2 as pygame
+        import pygame
 
         from jnius import autoclass  # @UnresolvedImport
 
@@ -243,6 +255,7 @@ def choose_variants():
 
 def main():
 
+    print("main.main (SDL1DEBUG)")
     log_clock("Bootstrap to the start of init.init")
 
     renpy.game.exception_info = 'Before loading the script.'
@@ -261,6 +274,7 @@ def main():
     renpy.display.touch = "touch" in renpy.config.variants
 
     log_clock("Early init")
+    print("early init (SDL1DBG)")
 
     # Note the game directory.
     game.basepath = renpy.config.gamedir
@@ -303,22 +317,27 @@ def main():
     renpy.loader.auto_init()
 
     log_clock("Loader init")
+    print("Loader init (SDL1DBG)")
 
     # Initialize the log.
     game.log = renpy.python.RollbackLog()
+    print("log initialized (SDL1DBG)")
 
     # Initialize the store.
     renpy.store.store = sys.modules['store']
+    print("store initialized (SDL1DBG)")
 
     # Set up styles.
     game.style = renpy.style.StyleManager()  # @UndefinedVariable
     renpy.store.style = game.style
+    print("style set up (SDL1DBG)")
 
     # Run init code in its own context. (Don't log.)
     game.contexts = [ renpy.execution.Context(False) ]
     game.contexts[0].init_phase = True
 
     renpy.execution.not_infinite_loop(60)
+    print("init code in own context ran (SDL1DBG)")
 
     # Load the script.
     renpy.game.exception_info = 'While loading the script.'
@@ -326,17 +345,23 @@ def main():
 
     if renpy.session.get("compile", False):
         renpy.game.args.compile = True
+    print("script loaded (SDL1DBG)")
 
     # Set up error handling.
     renpy.exports.load_module("_errorhandling")
+    print("errorhandling: module loaded (SDL1DBG)")
 
     if renpy.exports.loadable("tl/None/common.rpym") or renpy.exports.loadable("tl/None/common.rpymc"):
         renpy.exports.load_module("tl/None/common")
+    print("common module should've loaded")
 
     renpy.config.init_system_styles()
+    print("initialised system styles (SDL1DBG)")
     renpy.style.build_styles()  # @UndefinedVariable
+    print("built styles (SDL1DBG)")
 
     log_clock("Loading error handling")
+    print("loading error handling (SDL1DBG)")
 
     # If recompiling everything, remove orphan .rpyc files.
     # Otherwise, will fail in case orphan .rpyc have same
@@ -363,6 +388,7 @@ def main():
     # Load all .rpy files.
     renpy.game.script.load_script()  # sets renpy.game.script.
     log_clock("Loading script")
+    print("loading script (SDL1DBG)")
 
     if renpy.game.args.command == 'load-test':  # @UndefinedVariable
         start = time.time()
@@ -376,6 +402,7 @@ def main():
         sys.exit(0)
 
     renpy.game.exception_info = 'After loading the script.'
+    print("set exception_info (SDL1DBG)")
 
     # Find the save directory.
     if renpy.config.savedir is None:
@@ -392,6 +419,7 @@ def main():
         renpy.config.screen_width, renpy.config.screen_height = game.persistent._virtual_size
 
     # Init save locations.
+    print ("initialising save locations (SDL1DBG)")
     renpy.savelocation.init()
 
     # We need to be 100% sure we kill the savelocation thread.
@@ -436,14 +464,17 @@ def main():
                 renpy.game.seen_translates_count += 1
 
         log_clock("Running init code")
+        print("ran init code (SDL1DBG)")
 
         renpy.pyanalysis.load_cache()
         log_clock("Loading analysis data")
+        print("loaded anal data")
 
         # Analyze the script and compile ATL.
         renpy.game.script.analyze()
         renpy.atl.compile_all()
         log_clock("Analyze and compile ATL")
+	print("anal and comp atl (SDL1DBG)")
 
         # Index the archive files. We should not have loaded an image
         # before this point. (As pygame will not have been initialized.)
@@ -451,48 +482,61 @@ def main():
         # may have changed.
         renpy.loader.index_archives()
         log_clock("Index archives")
+        print("idx archives (SDL1DBG)")
 
         # Check some environment variables.
         renpy.game.less_memory = "RENPY_LESS_MEMORY" in os.environ
         renpy.game.less_mouse = "RENPY_LESS_MOUSE" in os.environ
         renpy.game.less_updates = "RENPY_LESS_UPDATES" in os.environ
+	print("checked env vars (SDL1DBG)")
 
         renpy.dump.dump(False)
         renpy.game.script.make_backups()
         log_clock("Dump and make backups.")
+        print("dumped and make baks (SDL1DBG)")
 
         # Initialize image cache.
         renpy.display.im.cache.init()
         log_clock("Cleaning cache")
+        print("cleaned cache (SDL1DBG)")
 
         # Make a clean copy of the store.
         renpy.python.make_clean_stores()
         log_clock("Making clean stores")
+        print("make clean stores (SDL1DBG)")
 
         # (Perhaps) Initialize graphics.
         if not game.interface:
             renpy.display.core.Interface()
             log_clock("Creating interface object")
+            print("Created interface obj (gfx) (SDL1DBG)")
+	print("Should've initialized gfx (SDL1DBG)")
 
         # Start things running.
         restart = None
+        print("start things running (SDL1DBG)")
 
         while True:
 
             if restart:
+		print("restart true (SDL1DBG)")
                 renpy.display.screen.before_restart()
 
             try:
                 try:
+		    print("the damn thing should be running at that point (SDL1DBG)")
                     run(restart)
                 finally:
+		    print("got past run (SDL1DBG)")
                     restart = (renpy.config.end_game_transition, "_invoke_main_menu", "_main_menu")
                     renpy.persistent.update(True)
 
             except game.FullRestartException, e:
+		print("fullrestart except (SDL1DBG)")
                 restart = e.reason
 
             finally:
+		print("user closed game, flushing everything (SDL1DBG)")
 
                 # Flush any pending interface work.
                 renpy.display.interface.finish_pending()
@@ -501,7 +545,7 @@ def main():
                 renpy.loadsave.autosave_not_running.wait(3.0)
 
     finally:
-
+	print("So long, gay bowser! (SDL1DBG)")
         renpy.loader.auto_quit()
         renpy.savelocation.quit()
         renpy.translation.write_updated_strings()

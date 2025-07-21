@@ -21,4 +21,4 @@
 
 from collections import OrderedDict
 
-include "stylesets.pxi"
+#include "stylesets.pxi"

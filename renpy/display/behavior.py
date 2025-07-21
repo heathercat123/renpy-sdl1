@@ -27,7 +27,7 @@ import renpy.audio
 
 from renpy.display.render import render, Render
 
-import pygame_sdl2 as pygame
+import pygame
 
 import math
 
@@ -632,12 +632,12 @@ class SayBehavior(renpy.display.layout.Null):
 ##############################################################################
 # Button
 
-KEY_EVENTS = (
-    pygame.KEYDOWN,
-    pygame.KEYUP,
-    pygame.TEXTEDITING,
-    pygame.TEXTINPUT
-    )
+#KEY_EVENTS = (
+#    pygame.KEYDOWN,
+#    pygame.KEYUP,
+#    pygame.TEXTEDITING,
+#    pygame.TEXTINPUT
+#    )
 
 
 class Button(renpy.display.layout.Window):

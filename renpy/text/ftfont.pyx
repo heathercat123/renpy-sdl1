@@ -20,10 +20,7 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from sdl2 cimport *
-from pygame_sdl2 cimport *
-import_pygame_sdl2()
-
+from pygame cimport *
 from freetype cimport *
 from ttgsubtable cimport *
 from textsupport cimport Glyph, SPLIT_INSTEAD

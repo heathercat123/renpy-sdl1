@@ -385,6 +385,7 @@ class Context(renpy.object.Object):
         exec(code)
 
     def run(self, node=None):
+	print("Arrived at context.run (SDL1DBG)")
         """
         Executes as many nodes as possible in the current context. If the
         node argument is given, starts executing from that node. Otherwise,
@@ -402,6 +403,7 @@ class Context(renpy.object.Object):
         tracing = sys.gettrace() is not None
 
         while node:
+	    print("context while loop")
 
             self.current = node.name
             self.last_abnormal = self.abnormal
@@ -426,6 +428,7 @@ class Context(renpy.object.Object):
             renpy.test.testexecution.take_name(self.current)
 
             try:
+		print("cntxt try (SDL1DBG)")
                 try:
                     check_infinite_loop()
 
@@ -433,9 +436,12 @@ class Context(renpy.object.Object):
                         self.report_coverage(node)
 
                     renpy.game.exception_info = "While running game code:"
+                    print("set except info (SDL1DBG)")
 
                     self.next_node = None
+                    print("node will go brrrrrrrrrr (SDL1DBG)")
                     node.execute()
+                    print("node went brrrrrrrrrr (SDL1DBG)")
 
                     if developer and self.next_node:
                         self.check_stacks()
@@ -741,6 +747,7 @@ class Context(renpy.object.Object):
 
 
 def run_context(top):
+    print("Run (hi from execution.py) context (SDL1DBG)")
     """
     Runs the current context until it can't be run anymore, while handling
     the RestartContext and RestartTopContext exceptions.
@@ -749,16 +756,20 @@ def run_context(top):
     label = None
 
     while True:
+	print("Oh boy, a while True! (SDL1DBG)")
 
         try:
 
             context = renpy.game.context()
+            print("We got the context (SDL1DBG)")
 
             if label and renpy.game.script.has_label(label):
                 context.call(label)
             label = None
 
+	    print("gonna run now (SDL1DBG)")
             context.run()
+            print("running is for nerds (SDL1DBG)")
 
             rv = renpy.store._return
 

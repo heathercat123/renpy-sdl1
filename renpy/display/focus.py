@@ -21,7 +21,7 @@
 
 # This file contains code to manage focus on the display.
 
-import pygame_sdl2 as pygame
+import pygame
 import renpy.display
 
 

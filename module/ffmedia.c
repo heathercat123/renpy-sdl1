@@ -1,3 +1,6 @@
+#include <pygame/pygame.h>
+#include <math.h>
+#include <limits.h>
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libswresample/swresample.h>
@@ -58,8 +61,8 @@ static int rwops_write(void *opaque, uint8_t *buf, int buf_size) {
 static int64_t rwops_seek(void *opaque, int64_t offset, int whence) {
     SDL_RWops *rw = (SDL_RWops *) opaque;
 
-    if (whence == AVSEEK_SIZE) {
-    	return rw->size(rw);
+    if (whence == 65536) {
+    	return -1;
     }
 
     // Ignore flags like AVSEEK_FORCE.
@@ -1140,11 +1143,11 @@ void media_start(MediaState *ms) {
 	char buf[1024];
 
 	snprintf(buf, 1024, "decode: %s", ms->filename);
-	SDL_Thread *t = SDL_CreateThread(decode_thread, buf, (void *) ms);
+	SDL_Thread *t = SDL_CreateThread(decode_thread, buf);
 
 	if (t) {
 		ms->started = 1;
-		SDL_DetachThread(t);
+		//SDL_DetachThread(t);
 	}
 }
 

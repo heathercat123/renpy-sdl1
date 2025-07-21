@@ -233,7 +233,8 @@ class TextSegment(object):
         Return the list of glyphs corresponding to unicode string s.
         """
 
-        fo = font.get_font(self.font, self.size, self.bold, self.italic, 0, self.antialias, self.vertical, self.hinting, layout.oversample)
+        #fo = font.get_font(self.font, self.size, self.bold, self.italic, 0, self.antialias, self.vertical, self.hinting, layout.oversample)
+        fo = font.get_font(self.font, self.size, self.bold, self.italic, 0, self.antialias, self.vertical, self.hinting, 1) #SDL1TODO
         rv = fo.glyphs(s)
 
         # Apply kerning to the glyphs.
@@ -263,7 +264,8 @@ class TextSegment(object):
             color = self.color
             black_color = self.black_color
 
-        fo = font.get_font(self.font, self.size, self.bold, self.italic, di.outline, self.antialias, self.vertical, self.hinting, layout.oversample)
+        #fo = font.get_font(self.font, self.size, self.bold, self.italic, di.outline, self.antialias, self.vertical, self.hinting, layout.oversample)
+        fo = font.get_font(self.font, self.size, self.bold, self.italic, di.outline, self.antialias, self.vertical, self.hinting, 1) #SDL1TODO
         fo.draw(di.surface, xo, yo, color, glyphs, self.underline, self.strikethrough, black_color)
 
     def assign_times(self, gt, glyphs):
@@ -313,7 +315,8 @@ class TextSegment(object):
         origin point.
         """
 
-        fo = font.get_font(self.font, self.size, self.bold, self.italic, 0, self.antialias, self.vertical, self.hinting, layout.oversample)
+        #fo = font.get_font(self.font, self.size, self.bold, self.italic, 0, self.antialias, self.vertical, self.hinting, layout.oversample)
+        fo = font.get_font(self.font, self.size, self.bold, self.italic, 0, self.antialias, self.vertical, self.hinting, 1) #SDL1TODO
         return fo.bounds(glyphs, bounds)
 
 
@@ -466,11 +469,11 @@ class Layout(object):
             Layout (which must be another Layout of the same text).
         """
 
-        if drawable_res and renpy.config.drawable_resolution_text:
+        if False: #SDL1TODO #drawable_res and renpy.config.drawable_resolution_text:
             # How much do we want to oversample the text by, compared to the
             # virtual resolution.
             self.oversample = renpy.display.draw.draw_per_virt
-
+            
             # Matrices to go from oversampled to virtual and vice versa.
             self.reverse = renpy.display.draw.draw_to_virt
             self.forward = renpy.display.draw.virt_to_draw
@@ -790,7 +793,7 @@ class Layout(object):
         if n is None:
             return n
 
-        return int(round(n * self.oversample))
+        return n * int(round(n * self.oversample))
 
     def scale_outline(self, n):
         if n is None:

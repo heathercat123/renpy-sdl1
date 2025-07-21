@@ -19,8 +19,12 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from pygame_sdl2 cimport *
-import_pygame_sdl2()
+cdef extern from "pygame/pygame.h":
+    cdef struct SDL_RWops:
+        pass
+
+    void import_pygame_rwobject()
+    SDL_RWops* RWopsFromPython(object obj)
 
 cdef extern from "renpysound_core.h":
 

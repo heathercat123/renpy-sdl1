@@ -24,7 +24,7 @@
 # going on.
 
 import threading
-import pygame_sdl2
+import pygame
 import os.path
 import sys
 import time
@@ -40,7 +40,7 @@ keep_running = False
 # The start time.
 start_time = time.time()
 
-PRESPLASHEVENT = pygame_sdl2.event.register("PRESPLASHEVENT")
+PRESPLASHEVENT = pygame.USEREVENT
 
 
 def run_event_thread():
@@ -48,12 +48,12 @@ def run_event_thread():
     Disposes of events while the window is running.
     """
 
-    pygame_sdl2.time.set_timer(PRESPLASHEVENT, 20)
+    pygame.time.set_timer(PRESPLASHEVENT, 20)
 
     while keep_running:
-        pygame_sdl2.event.wait()
+        pygame.event.wait()
 
-    pygame_sdl2.time.set_timer(PRESPLASHEVENT, 0)
+    pygame.time.set_timer(PRESPLASHEVENT, 0)
 
 
 def start(basedir, gamedir):
@@ -79,22 +79,22 @@ def start(basedir, gamedir):
 
         ctypes.windll.user32.SetProcessDPIAware()
 
-    pygame_sdl2.display.init()
+    pygame.display.init()
 
-    img = pygame_sdl2.image.load(fn, fn)
+    img = pygame.image.load(fn, fn)
 
     global window
 
-    bounds = pygame_sdl2.display.get_display_bounds(0)
+    bounds = pygame.display.get_display_bounds(0)
 
     sw, sh = img.get_size()
     x = bounds[0] + bounds[2] // 2 - sw // 2
     y = bounds[1] + bounds[3] // 2 - sh // 2
 
-    window = pygame_sdl2.display.Window(
+    window = pygame.display.Window(
         sys.argv[0],
         img.get_size(),
-        flags=pygame_sdl2.WINDOW_BORDERLESS,
+        flags=pygame.WINDOW_BORDERLESS,
         pos=(x, y))
 
     img = img.convert_alpha(window.get_surface())

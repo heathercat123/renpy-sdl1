@@ -27,7 +27,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <SDL_thread.h>
 #include <stdio.h>
 #include <string.h>
-#include <pygame_sdl2/pygame_sdl2.h>
+#include <pygame/pygame.h>
 
 #define MAXVOLUME 16384
 
@@ -1207,7 +1207,6 @@ void RPS_init(int freq, int stereo, int samples, int status) {
     name_mutex = SDL_CreateMutex();
 
     PyEval_InitThreads();
-    import_pygame_sdl2();
 
     if (!thread) {
         thread = PyThreadState_Get();
@@ -1296,7 +1295,6 @@ void RPS_advance_time(void) {
 }
 
 void RPS_sample_surfaces(PyObject *rgb, PyObject *rgba) {
-    import_pygame_sdl2();
 
     media_sample_surfaces(
 			PySurface_AsSurface(rgb),

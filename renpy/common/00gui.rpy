@@ -254,7 +254,7 @@ init -1100 python in gui:
         import store.gui as gui
         from store import config, Color
 
-        import pygame_sdl2
+        import pygame
         import os
 
         if not config.developer:
@@ -263,7 +263,7 @@ init -1100 python in gui:
         class Image(object):
 
             def __init__(self, dn, fn, width, height):
-                self.s = pygame_sdl2.Surface((width, height), pygame_sdl2.SRCALPHA)
+                self.s = pygame.Surface((width, height), pygame.SRCALPHA)
                 self.fn = os.path.join(config.gamedir, "gui", dn, fn + ".png")
                 self.width = width
                 self.height = height

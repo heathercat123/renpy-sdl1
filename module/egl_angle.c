@@ -61,7 +61,6 @@ char *egl_init(int interval) {
     };
 
     if (!imported_pygame) {
-    	import_pygame_sdl2();
     	imported_pygame = 1;
     }
 

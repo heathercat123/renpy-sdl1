@@ -21,7 +21,7 @@
 
 # This file handles imagemap caching.
 
-import pygame_sdl2 as pygame
+import pygame
 import renpy.display
 
 from renpy.display.render import render

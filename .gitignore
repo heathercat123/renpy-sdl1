@@ -3,6 +3,7 @@
 *.rpymc
 *.pyc
 *.pyo
+*.vmdk
 
 *~
 *.bak

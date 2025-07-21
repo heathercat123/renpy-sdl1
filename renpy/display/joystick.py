@@ -23,7 +23,7 @@
 # been removed, save for a few compatibility functions.
 
 import renpy.display
-import pygame_sdl2
+import pygame
 
 # Do we have a joystick enabled?
 enabled = False
@@ -41,7 +41,7 @@ joysticks = { }
 
 
 def count():
-    return pygame_sdl2.joystick.get_count()
+    return pygame.joystick.get_count()
 
 
 def get(n):
@@ -50,7 +50,7 @@ def get(n):
         return joysticks[n]
 
     try:
-        joysticks[n] = pygame_sdl2.joystick.Joystick(n)
+        joysticks[n] = pygame.joystick.Joystick(n)
         return joysticks[n]
     except:
         return None

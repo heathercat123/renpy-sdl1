@@ -28,7 +28,7 @@ import renpy.audio
 import renpy.text
 import renpy.test
 
-import pygame_sdl2 as pygame
+import pygame
 
 import sys
 import os
@@ -44,55 +44,53 @@ try:
 except:
     android = None
 
-TIMEEVENT = pygame.event.register("TIMEEVENT")
-PERIODIC = pygame.event.register("PERIODIC")
-REDRAW = pygame.event.register("REDRAW")
-EVENTNAME = pygame.event.register("EVENTNAME")
+TIMEEVENT = pygame.USEREVENT
+PERIODIC = pygame.USEREVENT + 1
+REDRAW = pygame.USEREVENT + 2
+EVENTNAME = pygame.USEREVENT + 3
 
 # All events except for TIMEEVENT and REDRAW
-ALL_EVENTS = set(pygame.event.get_standard_events())  # @UndefinedVariable
-ALL_EVENTS.add(PERIODIC)
-ALL_EVENTS.add(EVENTNAME)
+ALL_EVENTS = [ i for i in range(0, REDRAW + 1) if i != TIMEEVENT and i != REDRAW ]
 
 enabled_events = {
     pygame.QUIT,
 
-    pygame.APP_TERMINATING,
-    pygame.APP_LOWMEMORY,
-    pygame.APP_WILLENTERBACKGROUND,
-    pygame.APP_DIDENTERBACKGROUND,
-    pygame.APP_WILLENTERFOREGROUND,
-    pygame.APP_DIDENTERFOREGROUND,
+    #pygame.APP_TERMINATING,
+    #pygame.APP_LOWMEMORY,
+    #pygame.APP_WILLENTERBACKGROUND,
+    #pygame.APP_DIDENTERBACKGROUND,
+    #pygame.APP_WILLENTERFOREGROUND,
+    #pygame.APP_DIDENTERFOREGROUND,
 
-    pygame.WINDOWEVENT,
+    #pygame.WINDOWEVENT,
     pygame.SYSWMEVENT,
 
     pygame.KEYDOWN,
     pygame.KEYUP,
 
-    pygame.TEXTEDITING,
-    pygame.TEXTINPUT,
+    #pygame.TEXTEDITING,
+    #pygame.TEXTINPUT,
 
     pygame.MOUSEMOTION,
     pygame.MOUSEBUTTONDOWN,
     pygame.MOUSEBUTTONUP,
-    pygame.MOUSEWHEEL,
+    #pygame.MOUSEWHEEL,
 
     pygame.JOYAXISMOTION,
     pygame.JOYHATMOTION,
     pygame.JOYBALLMOTION,
     pygame.JOYBUTTONDOWN,
     pygame.JOYBUTTONUP,
-    pygame.JOYDEVICEADDED,
-    pygame.JOYDEVICEREMOVED,
+    #pygame.JOYDEVICEADDED,
+    #pygame.JOYDEVICEREMOVED,
 
-    pygame.CONTROLLERAXISMOTION,
-    pygame.CONTROLLERBUTTONDOWN,
-    pygame.CONTROLLERBUTTONUP,
-    pygame.CONTROLLERDEVICEADDED,
-    pygame.CONTROLLERDEVICEREMOVED,
+    #pygame.CONTROLLERAXISMOTION,
+    #pygame.CONTROLLERBUTTONDOWN,
+    #pygame.CONTROLLERBUTTONUP,
+    #pygame.CONTROLLERDEVICEADDED,
+    #pygame.CONTROLLERDEVICEREMOVED,
 
-    pygame.RENDER_TARGETS_RESET,
+    #pygame.RENDER_TARGETS_RESET,
 
     TIMEEVENT,
     PERIODIC,
@@ -1460,7 +1458,7 @@ class Interface(object):
         self.transition_from = { }
         self.suppress_transition = False
         self.quick_quit = False
-        self.force_redraw = False
+        self.force_redraw = True
         self.restart_interaction = False
         self.pushed_event = None
         self.ticks = 0
@@ -1722,17 +1720,6 @@ class Interface(object):
 
         if android:
             android.wakelock(True)
-
-        # Block events we don't use.
-        for i in pygame.event.get_standard_events():
-
-            if i in enabled_events:
-                continue
-
-            if i in renpy.config.pygame_events:
-                continue
-
-            pygame.event.set_blocked(i)
 
     def set_icon(self):
         """
@@ -2319,11 +2306,11 @@ class Interface(object):
 
             renpy.persistent.update(True)
 
-        if ev.type == pygame.APP_TERMINATING:
+        #if ev.type == pygame.APP_TERMINATING:
             save()
             sys.exit(0)
 
-        if ev.type != pygame.APP_WILLENTERBACKGROUND:
+        if True: #ev.type != pygame.APP_WILLENTERBACKGROUND:
             return False
 
         # At this point, we're about to enter the background.
@@ -3078,14 +3065,14 @@ class Interface(object):
                     continue
 
                 # Ignore KEY-events while text is being edited (usually with an IME).
-                if ev.type == pygame.TEXTEDITING:
+                if False: # SDL1TODO #ev.type == pygame.TEXTEDITING:
                     if ev.text:
                         self.text_editing = ev
                     else:
                         self.text_editing = None
-                elif ev.type == pygame.TEXTINPUT:
+                elif False: # SDL1TODO #ev.type == pygame.TEXTINPUT:
                     self.text_editing = None
-                elif self.text_editing and ev.type in [ pygame.KEYDOWN, pygame.KEYUP ]:
+                elif False: # SDL1TODO #self.text_editing and ev.type in [ pygame.KEYDOWN, pygame.KEYUP ]:
                     continue
 
                 if ev.type == pygame.VIDEOEXPOSE:

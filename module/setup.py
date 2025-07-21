@@ -68,7 +68,7 @@ else:
 
 include("zlib.h")
 include("png.h")
-include("SDL.h", directory="SDL2")
+include("SDL.h", directory="SDL")
 include("ft2build.h")
 include("freetype/freetype.h", directory="freetype2", optional=True) or include("freetype.h", directory="freetype2")
 include("libavutil/avstring.h", directory="ffmpeg", optional=True) or include("libavutil/avstring.h")
@@ -76,9 +76,9 @@ include("libavformat/avformat.h", directory="ffmpeg", optional=True) or include(
 include("libavcodec/avcodec.h", directory="ffmpeg", optional=True) or include("libavcodec/avcodec.h")
 include("libswscale/swscale.h", directory="ffmpeg", optional=True) or include("libswscale/swscale.h")
 include("GL/glew.h")
-include("pygame_sdl2/pygame_sdl2.h", directory="python{}.{}".format(sys.version_info.major, sys.version_info.minor))
+#include("pygame/pygame.h", directory="python{}.{}".format(sys.version_info.major, sys.version_info.minor))
 
-library("SDL2")
+library("SDL")
 library("png")
 library("avformat")
 library("avcodec")
@@ -95,10 +95,10 @@ has_libglew32 = library("glew32", optional=True)
 has_angle = windows and library("EGL", optional=True) and library("GLESv2", optional=True)
 
 if android:
-    sdl = [ 'SDL2', 'GLESv2', 'log' ]
+    sdl = [ 'SDL', 'GLESv2', 'log' ]
     png = 'png16'
 else:
-    sdl = [ 'SDL2' ]
+    sdl = [ 'SDL' ]
     png = 'png'
 
 
@@ -206,7 +206,7 @@ if not (android or ios):
     anglecopy("gltexture.pxd")
     anglecopy("gltexture.pyx")
 
-    angle_libs = [ "SDL2", "EGL", "GLESv2" ]
+    angle_libs = [ "SDL", "EGL", "GLESv2" ]
 
     def anglecython(name, source=[]):
         cython(name, libs=angle_libs, compile_if=has_angle, define_macros=[ ( "ANGLE", None ) ], source=source)

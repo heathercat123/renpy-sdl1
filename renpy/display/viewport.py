@@ -23,7 +23,7 @@
 # the screen.
 
 import renpy.display
-import pygame_sdl2 as pygame
+import pygame
 
 
 def edgescroll_proportional(n):
