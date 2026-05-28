@@ -1,4 +1,4 @@
-# Failed Ren'Py 6.99 SDL1 Backport
+# Incomplete Ren'Py 6.99 SDL1 Backport
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/heathercat123/renpy-sdl1/master/renpy.png" />
